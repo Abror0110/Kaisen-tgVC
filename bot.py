@@ -193,7 +193,7 @@ async def leave_voice_chat(client, message):
     await message.reply('Meninggalkan Voice Chat ✅')
 
 
-@app.on_message(filters.command('videoplay') & self_or_contact_filter)
+@app.on_message(filters.command('stream') & self_or_contact_filter)
 async def video_voice_chat(Clint, message):
     chat_id = message.chat.id
     from_user = inline_mention(event.sender)
