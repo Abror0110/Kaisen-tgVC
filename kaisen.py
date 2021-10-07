@@ -193,7 +193,7 @@ async def leave_voice_chat(client, message):
     await message.reply('Meninggalkan Voice Chat ✅')
 
 app.start()
-print('>>> Kaisen-tgVC Dimulai')
+print('>>> Userbot Dimulai')
 idle()
 app.stop()
-print('\n>>> Kaisen-tgVC Berhenti')
+print('\n>>> Userbot Berhenti')
