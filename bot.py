@@ -195,8 +195,7 @@ async def leave_voice_chat(client, message):
 
 @app.on_message(filters.command('videoplay') & self_or_contact_filter)
 async def video_voice_chat(Clint, message):
-    xx = await eor(event, get_string("com_1"))
-    chat = event.chat_id
+    chat_id = message.chat.id
     from_user = inline_mention(event.sender)
     reply, song = None, None
     if event.reply_to:
