@@ -1,4 +1,4 @@
-import os, asyncio, re, pafy
+import os, asyncio, re,
 from pyrogram import Client
 from youtubesearchpython import VideosSearch
 from pytube import YouTube
