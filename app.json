@@ -10,7 +10,7 @@
     ],
     "website": "https://infinityje.com",
     "repository": "https://github.com/Abror0110/Kaisen-tgVC",
-    "success_url": "https://t.me/Infinity_BOTs",
+    "success_url": "https://t.me/Rorflame_bot",
     "env": {
         "STRING_SESSION": {
             "description": "Your pyrogram string session from @siiniaja",
