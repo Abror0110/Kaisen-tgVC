@@ -198,7 +198,6 @@ async def stream_vc_chat(client, message):
     if not message.reply_to_message or not message.reply_to_message.audio:
         return
     msg = await message.reply("⏳ __Please wait.__")
-    if stream_vc == True:
         return await msg.edit("💬 __Live or Radio Ongoing. Please stop it via `!endvc`.__")
     media = message.reply_to_message
     THUMB_URL, VIDEO_TITLE, VIDEO_DURATION = "https://appletld.com/wp-content/uploads/2020/10/E3593D8D-6F1C-4A16-B065-2154ED6B2355.png", "Music", "Not Found"
