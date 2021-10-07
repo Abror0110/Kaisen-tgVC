@@ -195,7 +195,8 @@ async def leave_voice_chat(client, message):
 @app.on_message(filters.command('stream') & self_or_contact_filter)
 async def stream_vc_chat(client, message):
     global vc_live
-    if not message.chat.id == CHAT_ID: return
+    if not message.reply_to_message or not message.reply_to_message.audio:
+        return
     msg = await message.reply("⏳ __Please wait.__")
     if vc_live == True:
         return await msg.edit("💬 __Live or Radio Ongoing. Please stop it via `!endvc`.__")
