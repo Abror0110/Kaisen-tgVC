@@ -193,71 +193,43 @@ async def leave_voice_chat(client, message):
     await message.reply('Meninggalkan Voice Chat ✅')
 
 
-@app.on_message(filters.command('stream') & self_or_contact_filter)
-async def video_voice_chat(Clint, message):
-    chat_id = message.chat.id
-    from_user = inline_mention(event.sender)
-    reply, song = None, None
-    if event.reply_to:
-        reply = await event.get_reply_message()
-    if len(event.text.split()) > 1:
-        input = event.text.split(maxsplit=1)[1]
-        tiny_input = input.split()[0]
-        if tiny_input.startswith("@"):
-            try:
-                chat = int("-100" + str(await get_user_id(tiny_input, client=vcClient)))
-                song = input.split(maxsplit=1)[1]
-            except IndexError:
-                pass
-            except Exception as e:
-                return await eor(event, str(e))
-        elif tiny_input.startswith("-"):
-            chat = int(
-                "-100" + str(await get_user_id(int(tiny_input), client=vcClient))
-            )
-            try:
-                song = input.split(maxsplit=1)[1]
-            except BaseException:
-                pass
-        else:
-            song = input
-    if not (reply or song):
-        return await eor(
-            xx, "Please specify a song name or reply to a video file !", time=5
-        )
-    await eor(xx, "`Downloading and converting...`")
-    if reply and reply.media and mediainfo(reply.media).startswith("video"):
-        song, thumb, title, link, duration = await file_download(xx, reply)
-    else:
-        is_link = is_url_ok(song)
-        if is_link is False:
-            return await eor(xx, f"`{song}`\n\nNot a playable link.🥱")
-        if is_link is None:
-            song, thumb, title, link, duration = await vid_download(song)
-        elif re.search("youtube", song) or re.search("youtu", song):
-            song, thumb, title, link, duration = await vid_download(song)
-        else:
-            song, thumb, title, link, duration = (
-                song,
-                "https://telegra.ph/file/22bb2349da20c7524e4db.mp4",
-                song,
-                song,
-                "♾",
-            )
-    ultSongs = Player(chat, xx, True)
-    if not (await ultSongs.vc_joiner()):
-        return
-    await xx.reply(
-        "🎸 **Now playing:** [{}]({})\n⏰ **Duration:** `{}`\n👥 **Chat:** `{}`\n🙋‍♂ **Requested by:** {}".format(
-            title, link, duration, chat, from_user
-        ),
-        file=thumb,
-        link_preview=False,
-    )
-    await asyncio.sleep(1)
-    await ultSongs.group_call.start_video(song, with_audio=True)
-    await xx.delete()
 
+@app.on_message(filters.command('streamer') g self_or_contact_filter)
+async def stream_vc(client, message):
+    CHAT_ID = message.chat.id
+    if not str(CHAT_ID).startswith("-100"): return
+    msg = await message.reply("⏳ __Please wait.__")
+    media = message.reply_to_message
+    if media:
+        await msg.edit("📥 __Downloading...__")
+        LOCAL_FILE = await client.download_media(media)
+    else:
+        try: INPUT_SOURCE = message.text.split(" ", 1)[1]
+        except IndexError: return await msg.edit("🔎 __Give me a URL or Search Query.")
+        if ("youtube.com" in INPUT_SOURCE) or ("youtu.be" in INPUT_SOURCE):
+            FINAL_URL = INPUT_SOURCE
+        else:
+            FINAL_URL = yt_video_search(INPUT_SOURCE)
+            if FINAL_URL == 404:
+                return await msg.edit("__No videos found__ 🤷‍♂️")
+        await msg.edit("📥 __Downloading...__")
+        LOCAL_FILE = video_link_getter(FINAL_URL, key="v")
+        if LOCAL_FILE == 500: return await msg.edit("__Download Error.__ 🤷‍♂️")
+         
+    try:
+        group_call = GROUP_CALLS.get(CHAT_ID)
+        if group_call is None:
+            group_call = GroupCallFactory(vcusr, outgoing_audio_bitrate_kbit=512).get_group_call()
+            GROUP_CALLS[CHAT_ID] = group_call
+        if group_call.is_connected:
+            await group_call.stop()
+            await asyncio.sleep(3)
+        await group_call.join(CHAT_ID)
+        await msg.edit("🚩 Streaming...__")
+        await group_call.start_video(LOCAL_FILE, repeat=False, enable_experimental_lip_sync=True)
+    except Exception as e:
+        await message.reply(str(e))
+        return await group_call.stop()
 
 app.start()
 print('>>> Userbot Dimulai')
