@@ -2,9 +2,6 @@ pyrogram
 pytgcalls
 asyncio
 tgcrypto
-asyncio
-pytube
-youtube-search-python
 ffmpeg-python
 requests
 wget
