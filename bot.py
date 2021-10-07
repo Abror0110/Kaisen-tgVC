@@ -192,6 +192,42 @@ async def leave_voice_chat(client, message):
     VOICE_CHATS.pop(chat_id, None)
     await message.reply('Meninggalkan Voice Chat ✅')
 
+@app.on_message(filters.command('stream') & self_or_contact_filter)
+async def stream_vc_chat(client, message):
+    global vc_live
+    if not message.chat.id == CHAT_ID: return
+    msg = await message.reply("⏳ __Please wait.__")
+    if vc_live == True:
+        return await msg.edit("💬 __Live or Radio Ongoing. Please stop it via `!endvc`.__")
+    media = message.reply_to_message
+    THUMB_URL, VIDEO_TITLE, VIDEO_DURATION = "https://appletld.com/wp-content/uploads/2020/10/E3593D8D-6F1C-4A16-B065-2154ED6B2355.png", "Music", "Not Found"
+    if media and media.media:
+        await msg.edit("📥 __Downloading...__")
+        LOCAL_FILE = await client.download_media(media)
+    else:
+        try: INPUT_SOURCE = message.text.split(" ", 1)[1]
+        except IndexError: return await msg.edit("🔎 __Give me a URL or Search Query. Look__ `!help`")
+        if ("youtube.com" in INPUT_SOURCE) or ("youtu.be" in INPUT_SOURCE):
+            FINAL_URL = INPUT_SOURCE
+        else:
+            FINAL_URL = yt_video_search(INPUT_SOURCE)
+            if FINAL_URL == 404:
+                return await msg.edit("__No videos found__ 🤷‍♂️")
+        await msg.edit("📥 __Downloading...__")
+        LOCAL_FILE, THUMB_URL, VIDEO_TITLE, VIDEO_DURATION = video_info_extract(FINAL_URL, key="audio")
+        if LOCAL_FILE == 500: return await msg.edit("__Download Error.__ 🤷‍♂️")
+    try:
+        post_data = {'LOCAL_FILE':LOCAL_FILE, 'THUMB_URL':THUMB_URL, 'VIDEO_TITLE':VIDEO_TITLE, 'VIDEO_DURATION':VIDEO_DURATION, 'TYPE':'video'}
+        resp = await play_or_queue("add", post_data)
+        if resp['status'] == 'queue':
+            await msg.edit(resp['msg'])
+        elif resp['status'] == 'play':
+            await msg.delete()
+            await message.reply_photo(resp['thumb'], caption=resp['msg'])
+    except Exception as e:
+        await message.reply(str(e))
+        return await group_call.stop()
+
 app.start()
 print('>>> Userbot Dimulai')
 idle()
