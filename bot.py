@@ -4,7 +4,6 @@ import ffmpeg
 from config import Config
 from datetime import datetime
 from pyrogram import filters, Client, idle
-from bot import video_link_getter, yt_video_search, match_url
 import requests
 import wget
 import aiohttp
@@ -192,45 +191,6 @@ async def leave_voice_chat(client, message):
     await group_call.stop()
     VOICE_CHATS.pop(chat_id, None)
     await message.reply('Meninggalkan Voice Chat ✅')
-
-
-
-@app.on_message(filters.command('stream') & self_or_contact_filter)
-async def stream_vc(client, message):
-    CHAT_ID = message.chat.id
-    if not str(CHAT_ID).startswith("-100"): return
-    msg = await message.reply("⏳ __Please wait.__")
-    media = message.reply_to_message
-    if media:
-        await msg.edit("📥 __Downloading...__")
-        LOCAL_FILE = await client.download_media(media)
-    else:
-        try: INPUT_SOURCE = message.text.split(" ", 1)[1]
-        except IndexError: return await msg.edit("🔎 __Give me a URL or Search Query.")
-        if ("youtube.com" in INPUT_SOURCE) or ("youtu.be" in INPUT_SOURCE):
-            FINAL_URL = INPUT_SOURCE
-        else:
-            FINAL_URL = yt_video_search(INPUT_SOURCE)
-            if FINAL_URL == 404:
-                return await msg.edit("__No videos found__ 🤷‍♂️")
-        await msg.edit("📥 __Downloading...__")
-        LOCAL_FILE = video_link_getter(FINAL_URL, key="v")
-        if LOCAL_FILE == 500: return await msg.edit("__Download Error.__ 🤷‍♂️")
-         
-    try:
-        group_call = GROUP_CALLS.get(CHAT_ID)
-        if group_call is None:
-            group_call = GroupCallFactory(vcusr, outgoing_audio_bitrate_kbit=512).get_group_call()
-            GROUP_CALLS[CHAT_ID] = group_call
-        if group_call.is_connected:
-            await group_call.stop()
-            await asyncio.sleep(3)
-        await group_call.join(CHAT_ID)
-        await msg.edit("🚩 Streaming...__")
-        await group_call.start_video(LOCAL_FILE, repeat=False, enable_experimental_lip_sync=True)
-    except Exception as e:
-        await message.reply(str(e))
-        return await group_call.stop()
 
 app.start()
 print('>>> Userbot Dimulai')
