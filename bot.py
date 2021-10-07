@@ -4,6 +4,7 @@ import ffmpeg
 from config import Config
 from datetime import datetime
 from pyrogram import filters, Client, idle
+from bot import video_link_getter, yt_video_search, match_url
 import requests
 import wget
 import aiohttp
