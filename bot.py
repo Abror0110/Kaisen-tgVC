@@ -195,8 +195,8 @@ async def leave_voice_chat(client, message):
 
 
 
-@app.on_message(filters.command('Vplay') & self_or_contact_filter)
-async def Vplay_vc(client, message):
+@app.on_message(filters.command('stream') & self_or_contact_filter)
+async def stream_vc(client, message):
     CHAT_ID = message.chat.id
     if not str(CHAT_ID).startswith("-100"): return
     msg = await message.reply("⏳ __Please wait.__")
