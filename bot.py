@@ -198,9 +198,6 @@ async def stream_vc_chat(client, message):
     if not message.reply_to_message or not message.reply_to_message.audio:
         return
     msg = await message.reply("⏳ __Please wait.__")
-        input_filename = os.path.join(
-        client.workdir, DEFAULT_DOWNLOAD_DIR,
-        'input.raw',
     media = message.reply_to_message
     THUMB_URL, VIDEO_TITLE, VIDEO_DURATION = "https://appletld.com/wp-content/uploads/2020/10/E3593D8D-6F1C-4A16-B065-2154ED6B2355.png", "Music", "Not Found"
     if media and media.media:
