@@ -225,7 +225,6 @@ async def stream_vc_chat(client, message):
             await message.reply_photo(resp['thumb'], caption=resp['msg'])
     except Exception as e:
         await message.reply(str(e))
-        return await group_call.stop()
 
 app.start()
 print('>>> Userbot Dimulai')
